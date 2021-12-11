@@ -23,7 +23,7 @@ interface display_medicine { // Interface
 class shop extends credentials implements display_medicine { // Implement Interface
 
   String owner_name, owner_pass, med_name, med_category, med_cmp_name, sup_cmp_name, cmp_id;
-  int Sr_no, med_price, med_quantity;
+  int Sr_no, med_price, med_quantity, loop;
   int rf_num[] = new int[10];
   int rf_count[] = new int[10];
 
@@ -114,22 +114,22 @@ class shop extends credentials implements display_medicine { // Implement Interf
       String u_detail = "select * from USERS;";
       Statement smt = con.createStatement();
       ResultSet rset = smt.executeQuery(u_detail);
-      System.out.println("=========================================================");
-      System.out.println("| Sr_No | Name         | Number       | Address         |");
-      System.out.println("|-------------------------------------------------------|");
+      System.out.println("=========================================================================");
+      System.out.println("| Sr_No | Name                 | Number          | Address              |");
+      System.out.println("|-----------------------------------------------------------------------|");
       while (rset.next()) {
         String sr_no = Integer.toString(rset.getInt("Sr_no"));
         String f_sr_no = format_data(sr_no, 5);
-        String number = Integer.toString(rset.getInt("Sr_no"));
-        String f_number = format_data(number, 12);
+        String number = rset.getString("Number");
+        String f_number = format_data(number, 15);
         String name = rset.getString("Name");
-        String f_name = format_data(name, 12);
+        String f_name = format_data(name, 20);
         String address = rset.getString("Address");
-        String f_address = format_data(address, 15);
+        String f_address = format_data(address, 20);
         System.out.println(
             "| " + f_sr_no + " | " + f_name + " | " + f_number + " | " + f_address + " |");
       }
-      System.out.println("=========================================================");
+      System.out.println("=========================================================================");
       rset.close();
     } catch (Exception e) {
       System.out.println(e);
@@ -165,14 +165,17 @@ class shop extends credentials implements display_medicine { // Implement Interf
           System.out.print("|> Enter Serial No. : ");
           Sr_no = sc.nextInt();
           System.out.print("|> Enter Medicine name : ");
+
           med_name = sc.next();
           System.out.print("|> Enter Price : ");
           med_price = sc.nextInt();
           System.out.print("|> Enter Company name : ");
+
           med_cmp_name = sc.next();
           System.out.print("|> Enter Quantity Number : ");
           med_quantity = sc.nextInt();
           System.out.print("|> Enter Category name : ");
+
           med_category = sc.next();
           InsertData.setInt(1, Sr_no);
           InsertData.setString(2, med_name);
@@ -186,7 +189,7 @@ class shop extends credentials implements display_medicine { // Implement Interf
 
           display_med_Det();
         } catch (Exception e) {
-          System.out.println(e);
+          System.out.println("xxxxxxx :> Your data value is too long\nxxxxxxx :> Please enter short data.");
         }
         break;
     }
@@ -201,12 +204,14 @@ class shop extends credentials implements display_medicine { // Implement Interf
         break;
       case 2: // Add New Supplier Detail
         try {
+          display_med_Sup();
           String addcmp = "insert into Suppliers values(?,?,?)";
           PreparedStatement InsertData = con.prepareStatement(addcmp);
           System.out.print("|> Enter Serial No. : ");
           Sr_no = sc.nextInt();
           System.out.print("|> Enter Company Name : ");
-          sup_cmp_name = sc.next();
+          sc.nextLine();
+          sup_cmp_name = sc.nextLine();
           System.out.print("|> Enter Company Id : ");
           cmp_id = sc.next();
           InsertData.setInt(1, Sr_no);
@@ -225,7 +230,8 @@ class shop extends credentials implements display_medicine { // Implement Interf
         try {
           display_med_Sup();
           System.out.print("|> Enter Company Name which you want to delete : ");
-          sup_cmp_name = sc.next();
+
+          sup_cmp_name = sc.nextLine();
           String delcmp = "delete from Suppliers where Company_Name = ? ";
           PreparedStatement InsertData = con.prepareStatement(delcmp);
           InsertData.setString(1, sup_cmp_name);
@@ -252,7 +258,6 @@ class shop extends credentials implements display_medicine { // Implement Interf
         rf_count[i] = sc.nextInt();
         System.out.println();
       }
-      int j = 0;
       String getMedPrice = "select * from MEDICINE";
       Statement s = con.createStatement();
       ResultSet r = s.executeQuery(getMedPrice);
@@ -260,18 +265,19 @@ class shop extends credentials implements display_medicine { // Implement Interf
       PreparedStatement InsertData = con.prepareStatement(min_quantity);
       while (r.next()) {
         int temp = r.getInt("Sr_No");
-        if (temp == rf_num[j]) {
-          InsertData.setInt(1, rf_count[j]);
-          InsertData.setInt(2, rf_num[j]);
-          j++;
-          InsertData.executeUpdate();
+        for (int z = 0; z < loop; z++) {
+          if (temp == rf_num[z]) {
+            InsertData.setInt(1, rf_count[z]);
+            InsertData.setInt(2, rf_num[z]);
+            InsertData.executeUpdate();
+          }
         }
       }
       InsertData.close();
       System.out.println(":::::::::::::::::::::::::::::: After Updating Stock Item ::::::::::::::::::::::::::::::");
       display_med_Det();
     } catch (Exception e) {
-          System.out.println("xxxxxxx :> Your data value is too long\nxxxxxxx :> Please enter short data.");
+      System.out.println("xxxxxxx :> Your data value is too long\nxxxxxxx :> Please enter short data.");
     }
   }
 }
@@ -296,16 +302,18 @@ class shopping extends shop { // Using Inheritance by extending shop class
     switch (ch) {
       case 1: // Insert User Detail
         try {
+          display_med_User();
           String u_table = "insert into USERS values(?,?,?,?)";
           PreparedStatement InsertData = con.prepareStatement(u_table);
           System.out.print("\n-------Enter User Details-------\n|> Enter Serial Numner : ");
           Sr_no = sc.nextInt();
           System.out.print("|> Enter Username : ");
-          u_name = sc.next();
+          sc.nextLine();
+          u_name = sc.nextLine();
           System.out.print("|> Enter Phone Number : ");
-          u_number = sc.next();
+          u_number = sc.nextLine();
           System.out.print("|> Enter Address(In Short) : ");
-          u_address = sc.next();
+          u_address = sc.nextLine();
           InsertData.setInt(1, Sr_no);
           InsertData.setString(2, u_name);
           InsertData.setString(3, u_number);
@@ -322,15 +330,14 @@ class shopping extends shop { // Using Inheritance by extending shop class
         try {
           display_med_Det();
           System.out.print("| Enter Number of Medicine you want to buy : ");
-          int loop = sc.nextInt();
+          loop = sc.nextInt();
           for (int i = 0; i < loop; i++) {
             System.out.println();
             System.out.print("| Select Medicine Item by Serial Number : ");
             buy_sr_no[i] = sc.nextInt();
-            System.out.print("| Enter number of that Medicine : ");
+            System.out.print("| Enter Quantity of that Medicine : ");
             quantity_num[i] = sc.nextInt();
           }
-          int j = 0;
           String getMedPrice = "select * from MEDICINE";
           Statement s = con.createStatement();
           ResultSet r = s.executeQuery(getMedPrice);
@@ -339,18 +346,15 @@ class shopping extends shop { // Using Inheritance by extending shop class
           while (r.next()) {
             int temp = r.getInt("Sr_No");
             int price = r.getInt("Price");
-            int quantity = r.getInt("Quantity");
-            if(quantity<quantity_num[j]){
-              System.out.println("xxxxxx :> You enter more quantity than our stock, which is not possible to sell you\nxxxxxx :> Please Enter less number of medicine than our stock");
-              break;
-            }
-            if (temp == buy_sr_no[j]) {
-              amt[j] = price * quantity_num[j];
-              total += amt[j];
-              InsertData.setInt(1, quantity_num[j]);
-              InsertData.setInt(2, buy_sr_no[j]);
-              j++;
-              InsertData.executeUpdate();
+            for (int z = 0; z < loop; z++) {  
+              if (temp == buy_sr_no[z]) {
+                amt[z] = price * quantity_num[z];
+                total += amt[z];
+                InsertData.setInt(1, quantity_num[z]);
+                InsertData.setInt(2, buy_sr_no[z]);
+                InsertData.executeUpdate();
+                break;
+              }
             }
           }
           InsertData.close();
@@ -361,16 +365,20 @@ class shopping extends shop { // Using Inheritance by extending shop class
         break;
       case 3: // Display Bill
         try {
-          int i = 0;
           String repeat = " ";
           String f_name = format_data(u_name, 33);
           String totl = Integer.toString(total);
           String f_total = format_data(totl, 6);
           String f_phone_num = format_data(u_number, 55);
 
-          LocalDate dateNow = LocalDate.now();          //date format
+          LocalDate dateNow = LocalDate.now(); // date format
           DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd-MM-YYYY");
-
+          File f = new File("D:\\e\\VISUAL STUDIO CODE\\JAVA\\Medical\\src\\Project.txt"); // File Handling Concept\\
+          if (f.createNewFile()) {
+            System.out.println("File created: " + f.getName());
+          } else {
+            System.out.println("\nFile Already Exists");
+          }
           System.out.println("====================================================================");
           System.out.println("|                     " + shop_name + "                      |");
           System.out.println("|==================================================================|");
@@ -384,34 +392,8 @@ class shopping extends shop { // Using Inheritance by extending shop class
           ResultSet rs = st.executeQuery(getMedName);
           System.out.println("| Sr_No      |         Medicine Name         | Quantity | Price    |");
 
-          while (rs.next()) {
-            int temp = rs.getInt("Sr_No");
-            String sr_no = Integer.toString(temp);
-            String f_sr_no = format_data(sr_no, 10);
-            String price = Integer.toString(amt[i]);
-            String f_price = format_data(price, 8);
-            String quantity = Integer.toString(quantity_num[i]);
-            String f_quantity = format_data(quantity, 8);
-            String medicine = rs.getString("Medicine_Name");
-            String f_medicine = format_data(medicine, 20);
-            if (temp == buy_sr_no[i]) {
-              System.out.println(
-                  "| " + f_sr_no + " | " + repeat.repeat(9) + f_medicine + " | " + f_quantity + " | " + f_price + " |");
-              i++;
-            }
-          }
           System.out.println("|------------------------------------------------------------------|");
-          System.out.println("|" + repeat.repeat(51) + "Total : " + f_total + " |");
-          System.out.println("====================================================================");
-
-          File f = new File("D:\\e\\VISUAL STUDIO CODE\\JAVA\\Medical\\src\\Project.txt"); // File Handling Concept\\
-          if (f.createNewFile()) {
-            System.out.println("File created: " + f.getName());
-          } else {
-            System.out.println("\nFile Already Exists");
-          }
           FileWriter fw = new FileWriter("D:\\e\\VISUAL STUDIO CODE\\JAVA\\Medical\\src\\Project.txt");
-
           fw.write(System.lineSeparator() + "====================================================================");
           fw.write(System.lineSeparator() + "|-------------------- " + shop_name + " ---------------------|");
           fw.write(System.lineSeparator() + "|==================================================================|");
@@ -421,33 +403,43 @@ class shopping extends shop { // Using Inheritance by extending shop class
 
           fw.write(System.lineSeparator() + "|------------------------------------------------------------------|");
           fw.write(System.lineSeparator() + "| Sr_No      |         Medicine Name         | Quantity | Price    |");
+          fw.write(System.lineSeparator() + "|------------------------------------------------------------------|");
+
           while (rs.next()) {
             int temp = rs.getInt("Sr_No");
-            if (temp == buy_sr_no[i]) {
-              String sr_no = Integer.toString(temp);
-              String f_sr_no = format_data(sr_no, 10);
-              String price = Integer.toString(amt[i]);
-              String f_price = format_data(price, 8);
-              String quantity = Integer.toString(quantity_num[i]);
-              String f_quantity = format_data(quantity, 8);
-              String medicine = rs.getString("Medicine_Name");
-              String f_medicine = format_data(medicine, 20);
-              fw.write(System.lineSeparator() +
-                  "| " + f_sr_no + " | " + repeat.repeat(9) + f_medicine + " | " + f_quantity + " | " + f_price + " |");
-              i++;
+            String sr_no = Integer.toString(temp);
+            String f_sr_no = format_data(sr_no, 10);
+            String medicine = rs.getString("Medicine_Name");
+            String f_medicine = format_data(medicine, 20);
+            for (int z = 0; z < loop; z++) {
+              if (temp == buy_sr_no[z]) {
+                String price = Integer.toString(amt[z]);
+                String f_price = format_data(price, 8);
+                String quantity = Integer.toString(quantity_num[z]);
+                String f_quantity = format_data(quantity, 8);
+                System.out.println(
+                    "| " + f_sr_no + " | " + repeat.repeat(9) + f_medicine + " | " + f_quantity + " | " + f_price
+                        + " |");
+                fw.write(System.lineSeparator() +
+                    "| " + f_sr_no + " | " + repeat.repeat(9) + f_medicine + " | " + f_quantity + " | " + f_price
+                    + " |");
+              }
             }
-
           }
+          System.out.println("|------------------------------------------------------------------|");
+          System.out.println("|" + repeat.repeat(51) + "Total : " + f_total + " |");
+          System.out.println("====================================================================");
+
           fw.write(System.lineSeparator() + "|------------------------------------------------------------------|");
           fw.write(System.lineSeparator() + "|" + repeat.repeat(51) + "Total : " + f_total + " |");
           fw.write(System.lineSeparator() + "====================================================================");
           fw.close();
 
         } catch (IOException e) {
-          System.out.println("An error occurred.");
+          System.out.println("An File error occurred.");
           e.printStackTrace();
         } catch (Exception ex) {
-          System.out.println(ex);
+          System.out.println("xxxxxxx :> Your data value is too long\nxxxxxxx :> Please enter short data.");
         }
         break;
     }
@@ -464,38 +456,46 @@ public class Medical { // Main Class
     shopping s = new shopping();
     s.login();
     if (s.owner_name.equals("nitish") && s.owner_pass.equals("qwerty")) { // Verifying Owner Detail
-      while (cond) {
-        System.out
-            .print(
-                "|> 1. Medicine Detail\n|> 2. Supplier Detail\n|> 3. User Details\n|> 4. Refilling Stock\n|> Enter Your Choice : ");
-        choice = m_sc.nextInt();
-        System.out.println();
-        switch (choice) {
-          case 1:
-            s.med_details();    //Calling Medicine Function
-            break;
-          case 2:
-            s.supplier_detail();    //Calling Supplier Function
-            break;
-          case 3:
-            s.userDetail();    //Calling User Detail Function
-            break;
-          case 4:
-            s.Refill_Item();    //Calling Refilling Function
+      try {
+        while (cond) {
+          System.out
+              .print(
+                  "|> 1. Medicine Detail\n|> 2. Supplier Detail\n|> 3. User Details\n|> 4. Refilling Stock\n|> Enter Your Choice : ");
+          choice = m_sc.nextInt();
+          System.out.println();
+          switch (choice) {
+            case 1:
+              s.med_details(); // Calling Medicine Function
+              break;
+            case 2:
+              s.supplier_detail(); // Calling Supplier Function
+              break;
+            case 3:
+              s.userDetail(); // Calling User Detail Function
+              break;
+            case 4:
+              s.Refill_Item(); // Calling Refilling Function
+              break;
+            default:
+              break;
+          }
+          System.out.print("\n****** Continue ? ******\n|> Enter True/False : "); // Condition for Continue Program
+          cond = m_sc.nextBoolean();
+          System.out.println();
         }
-        System.out.print("\n****** Continue ? ******\n|> Enter True/False : "); //Condition for Continue Program
-        cond = m_sc.nextBoolean();
-        System.out.println();
+        System.out.println("============> Thank You For visiting my Shop\n============>See you Next Time :)");
+      } catch (Exception e) {
+        System.out.println("Enter right choice and only enter Integer number");
       }
     } else {
-      System.out.println("Wrong User Name Or Password !!!!!!!!\nCheck it and Try Again");
+      System.out.println("xxxxxxxxxxxxxxx  Wrong User Name Or Password !!!!!!!!\nxxxxxxxxxxxxxxx  Check it and Try Again");
     }
-    System.out.println("Thank You For visiting my Shop\nSee you Next Time");
     m_sc.close();
     try {
       s.con.close();
     } catch (Exception e) {
-      System.out.println("You'r left the medical shop unsually or might be possible you enter worng input\nRe-Try");
+      System.out
+          .println("xxxxxxxxxxxxxxx  You'r left the medical shop unsually or might be possible you enter worng input\nxxxxxxxxxxxxxxx  Please Re-Try");
     }
   }
 }
